@@ -1,51 +1,51 @@
-# 🚀 Gerenciador de Tarefas - API REST
+# 🚀 Gerenciador de Creche - API REST
 
-Um projeto de **API REST completo** desenvolvido com **Spring Boot 3.2** e **Java 17**, demonstrando boas práticas de desenvolvimento para desenvolvedor júnior Java.
+Projeto de **API REST** desenvolvido com **Spring Boot 3.2** e **Java 17**, para gerenciar alunos e turmas de creche.
 
 ## 📋 Sobre o Projeto
 
-Sistema de gerenciamento de tarefas com funcionalidades CRUD (Create, Read, Update, Delete), tratamento de exceções global, validação de dados e documentação automática com Swagger.
+Sistema de gerenciamento de alunos com funcionalidades CRUD, validação de dados, tratamento de exceções e documentação automática com Swagger.
 
 ## ✨ Tecnologias Utilizadas
 
-- **Java 17** - Linguagem de programação
-- **Spring Boot 3.2.5** - Framework web
-- **Spring Data JPA** - ORM para persistência
-- **H2 Database** - Banco de dados em memória
-- **Lombok** - Redução de boilerplate
-- **Swagger/OpenAPI** - Documentação automática da API
-- **JUnit 5** - Testes unitários
-- **Mockito** - Mock para testes
-- **Maven** - Gerenciador de dependências
+- **Java 17**
+- **Spring Boot 3.2.5**
+- **Spring Data JPA**
+- **H2 Database**
+- **Lombok**
+- **Swagger/OpenAPI**
+- **JUnit 5**
+- **Mockito**
+- **Maven**
 
 ## 🏗️ Arquitetura e Estrutura
 
 ```
 src/main/java/com/josielsants/gerenciadortarefas/
 ├── model/              # Entidades JPA
-│   └── Tarefa.java
+│   └── Aluno.java
 ├── repository/         # Camada de acesso a dados
-│   └── TarefaRepository.java
+│   └── AlunoRepository.java
 ├── service/            # Lógica de negócio
-│   └── TarefaService.java
+│   └── AlunoService.java
 ├── controller/         # Endpoints REST
-│   └── TarefaController.java
+│   └── AlunoController.java
 ├── exception/          # Tratamento de erros
-│   ├── TarefaNaoEncontradaException.java
+│   ├── AlunoNaoEncontradaException.java
 │   └── GlobalExceptionHandler.java
 └── GerenciadortarefasApplication.java  # Classe main
 ```
 
 ## 🎯 Conceitos Aplicados
 
-✅ **SOLID Principles** - Princípios de design orientado a objetos  
-✅ **Padrão MVC** - Model, View, Controller separação de responsabilidades  
-✅ **Injeção de Dependência** - Fornecida pelo Spring  
-✅ **REST API Design** - Endpoints profissionais com HTTP methods corretos  
-✅ **Validação de Dados** - Bean Validation com @NotBlank  
-✅ **Tratamento de Exceções** - @RestControllerAdvice e @ExceptionHandler  
-✅ **Testes Unitários** - JUnit 5 com Mockito  
-✅ **Documentação** - Swagger automático  
+✅ **SOLID Principles**
+✅ **Padrão MVC**
+✅ **Injeção de Dependência**
+✅ **REST API Design**
+✅ **Validação de Dados**
+✅ **Tratamento de Exceções**
+✅ **Testes Unitários**
+✅ **Documentação com Swagger**
 
 ## ⚡ Como Executar
 
@@ -56,6 +56,7 @@ src/main/java/com/josielsants/gerenciadortarefas/
 ### Passo 1: Clone o repositório
 ```bash
 git clone https://github.com/josielsants/gerenciador-de-creche01.git
+git checkout main
 cd gerenciador-de-creche01
 ```
 
@@ -69,50 +70,51 @@ mvn clean install
 mvn spring-boot:run
 ```
 
-Ou execute diretamente no IntelliJ IDEA clicando no botão verde ▶️.
-
 ### Passo 4: Acesse a aplicação
-- **API**: http://localhost:8080/api/tarefas
+- **API**: http://localhost:8080/api/alunos
 - **Swagger UI**: http://localhost:8080/swagger-ui.html
-- **Banco H2**: http://localhost:8080/h2-console (JDBC URL: `jdbc:h2:mem:tarefasdb`)
+- **Banco H2**: http://localhost:8080/h2-console
+  - JDBC URL: `jdbc:h2:mem:tarefasdb`
+  - Usuário: `sa`
+  - Senha: (vazia)
 
 ## 📡 Endpoints da API
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| `GET` | `/api/tarefas` | Lista todas as tarefas |
-| `GET` | `/api/tarefas/{id}` | Busca tarefa por ID |
-| `POST` | `/api/tarefas` | Cria nova tarefa |
-| `PUT` | `/api/tarefas/{id}` | Atualiza tarefa |
-| `DELETE` | `/api/tarefas/{id}` | Deleta tarefa |
-| `PATCH` | `/api/tarefas/{id}/concluir` | Marca como concluída |
-| `PATCH` | `/api/tarefas/{id}/reabrir` | Reabre tarefa |
+| `GET` | `/api/alunos` | Lista todos os alunos |
+| `GET` | `/api/alunos/{id}` | Busca aluno por ID |
+| `POST` | `/api/alunos` | Cria novo aluno |
+| `PUT` | `/api/alunos/{id}` | Atualiza aluno |
+| `DELETE` | `/api/alunos/{id}` | Remove aluno |
 
 ## 📝 Exemplos de Uso
 
-### Criar Tarefa
+### Criar Aluno
 ```bash
-curl -X POST http://localhost:8080/api/tarefas \
+curl -X POST http://localhost:8080/api/alunos \
   -H "Content-Type: application/json" \
   -d '{
-    "titulo": "Estudar Spring Boot",
-    "descricao": "Aprender os conceitos fundamentais"
+    "nome": "Ana",
+    "idade": 4,
+    "turma": "Creche A",
+    "responsavel": "Paulo",
+    "telefoneResponsavel": "(11) 99999-9999"
   }'
 ```
 
-### Listar Tarefas
+### Listar Alunos
 ```bash
-curl http://localhost:8080/api/tarefas
+curl http://localhost:8080/api/alunos
 ```
 
-### Atualizar Tarefa
+### Atualizar Aluno
 ```bash
-curl -X PUT http://localhost:8080/api/tarefas/1 \
+curl -X PUT http://localhost:8080/api/alunos/1 \
   -H "Content-Type: application/json" \
   -d '{
-    "titulo": "Estudar Spring Boot avançado",
-    "descricao": "Aprender tópicos avançados",
-    "concluida": true
+    "nome": "Ana Maria",
+    "telefoneResponsavel": "(11) 98888-8888"
   }'
 ```
 
@@ -122,61 +124,14 @@ curl -X PUT http://localhost:8080/api/tarefas/1 \
 mvn test
 ```
 
-Testes incluem:
-- ✅ Listar todas as tarefas
-- ✅ Buscar tarefa por ID
-- ✅ Lançar exceção quando tarefa não existe
-- ✅ Criar tarefa
-- ✅ Lançar exceção ao criar sem título
-- ✅ Atualizar tarefa
-- ✅ Deletar tarefa
-- ✅ Lançar exceção ao deletar tarefa inexistente
-
 ## 🔍 Tratamento de Erros
 
-A API retorna respostas estruturadas com status HTTP apropriados:
-
-```json
-{
-  "status": 404,
-  "mensagem": "Tarefa com ID 99 não encontrada.",
-  "timestamp": "2026-06-18T10:30:45"
-}
-```
-
-## 📚 Padrões de Commits Git
-
-Este projeto segue a especificação de commits convencionais:
-
-- `feat:` - Nova funcionalidade
-- `fix:` - Correção de bug
-- `docs:` - Documentação
-- `test:` - Adição de testes
-- `refactor:` - Refatoração de código
-- `style:` - Mudanças de formatação
-
-Exemplo:
-```bash
-git commit -m "feat: adiciona endpoint de criação de tarefa"
-```
-
-## 🚀 Próximos Passos
-
-- [ ] Adicionar autenticação JWT
-- [ ] Integrar com PostgreSQL
-- [ ] Deploy em Docker
-- [ ] Deploy em nuvem (Railway/Render)
-- [ ] Adicionar testes de integração
+A API retorna respostas estruturadas com status apropriados.
 
 ## 👨‍💻 Autor
 
-**Josiel Rabelo**  
-GitHub: [github.com/josielsants](https://github.com/josielsants)
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT.
+**Josiel Santos**
 
 ---
 
-⭐ Se este projeto foi útil, considere dar uma estrela no GitHub!
+⭐ Este projeto é ideal para quem quer um gerenciador de creche leve e completo em Spring Boot.

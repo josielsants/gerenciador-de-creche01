@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerenciador de Creche</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            padding: 40px 16px;
+        }
+
+        .container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 720px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 32px;
+        }
+
+        h1 {
+            font-size: 22px;
+            color: #1b4f8a;
+            margin-bottom: 4px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: #777;
+            margin-bottom: 24px;
+        }
+
+        .abas {
+            display: flex;
+            gap: 4px;
+            border-bottom: 1px solid #e5e8ec;
+            margin-bottom: 24px;
+            overflow-x: auto;
+        }
+
+        .aba {
+            border: none;
+            background: none;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #777;
+            cursor: pointer;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+        }
+
+        .aba.ativa {
+            color: #1b4f8a;
+            border-bottom: 2px solid #1b4f8a;
+            font-weight: 600;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"], input[type="number"] {
+            flex: 1;
+            min-width: 100px;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #1b4f8a;
+        }
+
+        button.adicionar {
+            background: #1b4f8a;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        button.adicionar:hover {
+            background: #14406f;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 8px 6px;
+            color: #777;
+            font-weight: 600;
+            border-bottom: 1px solid #e5e8ec;
+        }
+
+        tbody td {
+            padding: 10px 6px;
+            border-bottom: 1px solid #f0f2f5;
+            color: #333;
+        }
+
+        .acoes {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .acoes button {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 13px;
+            padding: 4px 6px;
+            cursor: pointer;
+        }
+
+        .acoes .excluir:hover { color: #c0392b; }
+        .acoes .editar:hover { color: #1b4f8a; }
+
+        .vazio {
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            padding: 24px 0;
+        }
+
+        .erro {
+            background: #fdecea;
+            color: #c0392b;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Gerenciador de Creche</h1>
+    <p class="subtitle">API REST com Spring Boot</p>
+
+    <div class="erro" id="erro"></div>
+
+    <div class="abas" id="abas"></div>
+    <div class="form-row" id="formulario"></div>
+    <table>
+        <thead id="cabecalho"></thead>
+        <tbody id="lista"></tbody>
+    </table>
+</div>
+
+<script>
+    const ENTIDADES = {
+        alunos: {
+            label: "Alunos",
+            campos: [
+                { nome: "nome", placeholder: "Nome do aluno", tipo: "text" },
+                { nome: "idade", placeholder: "Idade", tipo: "number" },
+                { nome: "turma", placeholder: "Turma", tipo: "text" },
+                { nome: "responsavelNome", placeholder: "Nome do responsável", tipo: "text" }
+            ],
+            colunas: ["nome", "idade", "turma", "responsavelNome"]
+        },
+        professores: {
+            label: "Professores",
+            campos: [
+                { nome: "nome", placeholder: "Nome do professor", tipo: "text" },
+                { nome: "disciplina", placeholder: "Disciplina", tipo: "text" },
+                { nome: "turmaResponsavel", placeholder: "Turma responsável", tipo: "text" }
+            ],
+            colunas: ["nome", "disciplina", "turmaResponsavel"]
+        },
+        coordenadores: {
+            label: "Coordenadores",
+            campos: [
+                { nome: "nome", placeholder: "Nome do coordenador", tipo: "text" },
+                { nome: "setor", placeholder: "Setor", tipo: "text" }
+            ],
+            colunas: ["nome", "setor"]
+        },
+        funcionarios: {
+            label: "Funcionários",
+            campos: [
+                { nome: "nome", placeholder: "Nome do funcionário", tipo: "text" },
+                { nome: "cargo", placeholder: "Cargo", tipo: "text" }
+            ],
+            colunas: ["nome", "cargo"]
+        },
+        responsaveis: {
+            label: "Responsáveis",
+            campos: [
+                { nome: "nome", placeholder: "Nome do responsável", tipo: "text" },
+                { nome: "telefone", placeholder: "Telefone", tipo: "text" },
+                { nome: "alunoVinculado", placeholder: "Aluno vinculado", tipo: "text" }
+            ],
+            colunas: ["nome", "telefone", "alunoVinculado"]
+        }
+    };
+
+    let entidadeAtual = "alunos";
+
+    function renderizarAbas() {
+        const abasDiv = document.getElementById("abas");
+        abasDiv.innerHTML = "";
+
+        Object.keys(ENTIDADES).forEach(chave => {
+            const btn = document.createElement("button");
+            btn.className = "aba" + (chave === entidadeAtual ? " ativa" : "");
+            btn.textContent = ENTIDADES[chave].label;
+            btn.onclick = () => {
+                entidadeAtual = chave;
+                renderizarAbas();
+                renderizarFormulario();
+                carregarLista();
+            };
+            abasDiv.appendChild(btn);
+        });
+    }
+
+    function renderizarFormulario() {
+        const formDiv = document.getElementById("formulario");
+        formDiv.innerHTML = "";
+
+        const config = ENTIDADES[entidadeAtual];
+
+        config.campos.forEach(campo => {
+            const input = document.createElement("input");
+            input.type = campo.tipo;
+            input.placeholder = campo.placeholder;
+            input.id = "campo-" + campo.nome;
+            formDiv.appendChild(input);
+        });
+
+        const botao = document.createElement("button");
+        botao.className = "adicionar";
+        botao.textContent = "Adicionar";
+        botao.onclick = criarRegistro;
+        formDiv.appendChild(botao);
+    }
+
+    function renderizarCabecalho() {
+        const cabecalho = document.getElementById("cabecalho");
+        const config = ENTIDADES[entidadeAtual];
+
+        let html = "<tr>";
+        config.colunas.forEach(coluna => {
+            html += `<th>${formatarNomeColuna(coluna)}</th>`;
+        });
+        html += `<th class="acoes">Ações</th></tr>`;
+
+        cabecalho.innerHTML = html;
+    }
+
+    function formatarNomeColuna(coluna) {
+        const nomes = {
+            nome: "Nome",
+            idade: "Idade",
+            turma: "Turma",
+            responsavelNome: "Responsável",
+            disciplina: "Disciplina",
+            turmaResponsavel: "Turma",
+            setor: "Setor",
+            cargo: "Cargo",
+            telefone: "Telefone",
+            alunoVinculado: "Aluno"
+        };
+        return nomes[coluna] || coluna;
+    }
+
+    async function carregarLista() {
+        renderizarCabecalho();
+        const lista = document.getElementById("lista");
+        lista.innerHTML = "";
+
+        try {
+            const resposta = await fetch("/" + entidadeAtual);
+            const registros = await resposta.json();
+
+            if (registros.length === 0) {
+                const config = ENTIDADES[entidadeAtual];
+                lista.innerHTML = `<tr><td colspan="${config.colunas.length + 1}" class="vazio">Nenhum registro cadastrado ainda.</td></tr>`;
+                return;
+            }
+
+            const config = ENTIDADES[entidadeAtual];
+
+            registros.forEach(registro => {
+                const tr = document.createElement("tr");
+                let html = "";
+
+                config.colunas.forEach(coluna => {
+                    html += `<td>${registro[coluna] !== undefined ? registro[coluna] : ""}</td>`;
+                });
+
+                html += `
+                    <td class="acoes">
+                        <button class="editar" onclick='editarRegistro(${registro.id})'>Editar</button>
+                        <button class="excluir" onclick="excluirRegistro(${registro.id})">Excluir</button>
+                    </td>
+                `;
+
+                tr.innerHTML = html;
+                lista.appendChild(tr);
+            });
+        } catch (erro) {
+            mostrarErro("Não foi possível carregar os dados. Verifique se a API está rodando.");
+        }
+    }
+
+    async function criarRegistro() {
+        const config = ENTIDADES[entidadeAtual];
+        const corpo = {};
+        let valido = true;
+
+        config.campos.forEach(campo => {
+            const input = document.getElementById("campo-" + campo.nome);
+            let valor = input.value.trim();
+
+            if (campo.nome === "nome" && !valor) {
+                valido = false;
+            }
+
+            corpo[campo.nome] = campo.tipo === "number" ? (valor ? parseInt(valor) : 0) : valor;
+        });
+
+        if (!valido) {
+            mostrarErro("O campo nome é obrigatório.");
+            return;
+        }
+
+        try {
+            const resposta = await fetch("/" + entidadeAtual, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(corpo)
+            });
+
+            if (!resposta.ok) {
+                throw new Error("Erro ao criar registro");
+            }
+
+            config.campos.forEach(campo => {
+                document.getElementById("campo-" + campo.nome).value = "";
+            });
+
+            esconderErro();
+            carregarLista();
+        } catch (erro) {
+            mostrarErro("Não foi possível salvar o registro.");
+        }
+    }
+
+    async function editarRegistro(id) {
+        try {
+            const resposta = await fetch(`/${entidadeAtual}/${id}`);
+            const registro = await resposta.json();
+            const config = ENTIDADES[entidadeAtual];
+
+            const corpo = {};
+            let cancelado = false;
+
+            for (const campo of config.campos) {
+                const valorAtual = registro[campo.nome] !== undefined ? registro[campo.nome] : "";
+                const novoValor = prompt(`${campo.placeholder}:`, valorAtual);
+
+                if (novoValor === null) {
+                    cancelado = true;
+                    break;
+                }
+
+                corpo[campo.nome] = campo.tipo === "number" ? (novoValor ? parseInt(novoValor) : 0) : novoValor;
+            }
+
+            if (cancelado) return;
+
+            await fetch(`/${entidadeAtual}/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(corpo)
+            });
+
+            carregarLista();
+        } catch (erro) {
+            mostrarErro("Não foi possível editar o registro.");
+        }
+    }
+
+    async function excluirRegistro(id) {
+        if (!confirm("Tem certeza que deseja excluir este registro?")) {
+            return;
+        }
+
+        try {
+            await fetch(`/${entidadeAtual}/${id}`, { method: "DELETE" });
+            carregarLista();
+        } catch (erro) {
+            mostrarErro("Não foi possível excluir o registro.");
+        }
+    }
+
+    function mostrarErro(mensagem) {
+        const div = document.getElementById("erro");
+        div.textContent = mensagem;
+        div.style.display = "block";
+    }
+
+    function esconderErro() {
+        document.getElementById("erro").style.display = "none";
+    }
+
+    renderizarAbas();
+    renderizarFormulario();
+    carregarLista();
+</script>
+
+</body>
+</html>

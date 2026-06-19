@@ -6,12 +6,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.josielsants</groupId>
-    <artifactId>gerenciador-tarefas</artifactId>
+    <artifactId>gerenciador-creche</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>Gerenciador de Tarefas</name>
-    <description>API REST de gerenciamento de tarefas com Spring Boot</description>
+    <name>Gerenciador de Creche</name>
+    <description>API REST de gerenciamento de creche com Spring Boot</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -86,6 +86,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <mainClass>com.josielsants.gerenciadorcreche.GerenciadorCrecheApplication</mainClass>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
